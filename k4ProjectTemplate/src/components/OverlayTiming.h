@@ -23,6 +23,7 @@ public:
 
 private:
   // member variable
+    std::map< std::string, std::pair<float, float> > collectionFilterTimes{};
     Gaudi::Property<std::vector<std::string> >inputFiles{this, "inputFiles", NULL,
                                           "Name of the lcio input file(s) with background - assume one file per bunch crossing."};
     Gaudi::Property<int> nEvents{this, "nEvents", float(1),
@@ -41,7 +42,6 @@ private:
                                           "Lower border of the integration time window for all collections"};
     Gaudi::Property<float> filterTimeMax{this, "filterTimeMax", float(0.25),
                                           "Upper border of the integration time window for all collections"};
-    Gaudi::Property<std::vector<std::string> > inputCollections{this, "inputCollections", NULL,
-                                          "Integration times for the Collections"};
-};
+    Gaudi::Property<std::map<std::string, std::vector<double> > > inputCollections{this, "inputCollections",std::map<std::string, std::vector<double> >()};
+ };
   
