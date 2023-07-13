@@ -17,15 +17,15 @@ StatusCode OverlayTiming::initialize() {
       low=filterTimeMin;
       high=filterTimeMax;
       key =entry.first;
+
       if(entry.second.size()>2){
-      info() << "_____________________________________________" << std::endl;
-      info() << std::endl<< "Error too much elements"<< std::endl;
-      info() << "_____________________________________________" << std::endl;
-      return StatusCode::FAILURE;
-      break;
+        info() << "_____________________________________________" << std::endl;
+        info() << std::endl<< "Error too much elements"<< std::endl;
+        info() << "_____________________________________________" << std::endl;
+        return StatusCode::FAILURE;
+        break;
       }
       if (entry.second.size() == 1) {
-        low = filterTimeMin;
         high = entry.second[0];
       } else 
       if (entry.second.size() == 2) {
@@ -33,15 +33,16 @@ StatusCode OverlayTiming::initialize() {
         high = entry.second[1];
       }
      
-     collectionFilterTimes[key] = std::pair<float, float>(low, high);
+    collectionFilterTimes[key] = std::pair<float, float>(low, high);
   }
-      info() << "_____________________________________________" << std::endl;
 
-       info() << "Collection integration times:"<< std::endl;
-      for (auto const& entry : collectionFilterTimes) {
-           info() << "  " << entry.first << ": " << entry.second.first << " -> " << entry.second.second << std::endl;
-       }
-    info() << "_____________________________________________";
+  info() << "_____________________________________________" << std::endl;
+  info() << "Collection integration times:"<< std::endl;
+
+  for (auto const& entry : collectionFilterTimes) {
+    info() << "  " << entry.first << ": " << entry.second.first << " -> " << entry.second.second << std::endl;
+  }
+  info() << "_____________________________________________";
 
 
 
@@ -63,6 +64,6 @@ StatusCode OverlayTiming::execute() {
     info() << endmsg;
     info() << endmsg;
     return StatusCode::SUCCESS;
-     }
+  }
 
 StatusCode OverlayTiming::finalize() { return GaudiAlgorithm::finalize();}

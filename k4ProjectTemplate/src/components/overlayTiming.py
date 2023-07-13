@@ -11,7 +11,7 @@ producer.inputCollections = {
     "CnnerTrackerBarrelColl": [-0.66, 0.12],
     "DertexBarrelCollection": [],
     "EertexEndcapCollection": [-0.76, 0.45],
-    "FnnerTrackerBarrelColl": [-0.26, 0.19, 0.55],
+    "FnnerTrackerBarrelColl": [-0.26, 0.19],
     "GertexBarrelCollection": [0.27],
     "HertexEndcapCollection": [0.33],
     "InnerTrackerBarrelColl": []
