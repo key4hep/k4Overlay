@@ -23,7 +23,6 @@ StatusCode OverlayTiming::initialize() {
         info() << std::endl<< "Error too much elements"<< std::endl;
         info() << "_____________________________________________" << std::endl;
         return StatusCode::FAILURE;
-        break;
       }
       if (entry.second.size() == 1) {
         high = entry.second[0];
