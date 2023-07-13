@@ -19,9 +19,7 @@ StatusCode OverlayTiming::initialize() {
       key =entry.first;
 
       if(entry.second.size()>2){
-        info() << "_____________________________________________" << std::endl;
-        info() << std::endl<< "Error too much elements"<< std::endl;
-        info() << "_____________________________________________" << std::endl;
+        info() << std::endl<< "Error too much elements.Number of elements should be <= 2 in collection inputCollections"<< std::endl;
         return StatusCode::FAILURE;
       }
       if (entry.second.size() == 1) {
@@ -34,16 +32,12 @@ StatusCode OverlayTiming::initialize() {
      
     collectionFilterTimes[key] = std::pair<float, float>(low, high);
   }
-
   info() << "_____________________________________________" << std::endl;
   info() << "Collection integration times:"<< std::endl;
-
   for (auto const& entry : collectionFilterTimes) {
     info() << "  " << entry.first << ": " << entry.second.first << " -> " << entry.second.second << std::endl;
   }
   info() << "_____________________________________________";
-
-
 
   return StatusCode::SUCCESS; }
 
