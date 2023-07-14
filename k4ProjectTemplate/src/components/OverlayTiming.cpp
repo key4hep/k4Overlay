@@ -19,7 +19,7 @@ StatusCode OverlayTiming::initialize() {
       key =entry.first;
 
       if(entry.second.size()>2){
-        info() << std::endl<< "Error. Number of elements should be <= 2 in collection inputCollections"<< std::endl;
+        info() << std::endl<< "Error. Number of elements should be <= 2 in collection "<< key<< std::endl;
         return StatusCode::FAILURE;
       }
       if (entry.second.size() == 1) {
