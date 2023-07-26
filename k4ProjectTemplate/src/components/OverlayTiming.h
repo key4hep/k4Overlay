@@ -1,5 +1,6 @@
 #pragma once
-
+#include "edm4hep/MCParticleCollection.h"
+#include "k4FWCore/DataHandle.h"
 // GAUDI
 #include "Gaudi/Property.h"
 #include "GaudiAlg/GaudiAlgorithm.h"
@@ -25,9 +26,11 @@ private:
   // member variable
     std::map< std::string, std::pair<float, float> > collectionFilterTimes{};
     Gaudi::Property<std::vector<std::string> >inputFiles{this, "inputFiles", NULL,
-                                          "Name of the lcio input file(s) with background - assume one file per bunch crossing."};
+                                          "Name of the edm4hep input file(s) with background - assume one file per bunch crossing."};
     Gaudi::Property<int> nEvents{this, "nEvents", float(1),
                                           "Number of Background events to overlay - either fixed or Poisson mean"};
+    Gaudi::Property<int> eventsPerFile{this, "eventsPerFile", float(1),
+                                          "Number of events in each input file"};
     Gaudi::Property<std::string> mcPhysicsParticleCollection{this, "mcPhysicsParticleCollection", "MCPhysicsParticle",
                                            "The output MC Particle Collection Name for the physics event"};
     Gaudi::Property<int> startFileIndex{this, "startFileIndex", -1,
@@ -43,5 +46,8 @@ private:
     Gaudi::Property<float> filterTimeMax{this, "filterTimeMax", float(0.25),
                                           "Upper border of the integration time window for all collections"};
     Gaudi::Property<std::map<std::string, std::vector<double> > > inputCollections{this, "inputCollections",std::map<std::string, std::vector<double> >()};
+
+
+    DataHandle<edm4hep::MCParticleCollection>    m_mcParticleHandle{"MCParticles", Gaudi::DataHandle::Reader, this};
  };
   
