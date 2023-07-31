@@ -1,5 +1,6 @@
 #pragma once
 #include "edm4hep/MCParticleCollection.h"
+#include "edm4hep/SimTrackerHitCollection.h"
 #include "k4FWCore/DataHandle.h"
 // GAUDI
 #include "Gaudi/Property.h"
@@ -49,5 +50,10 @@ private:
 
 
     DataHandle<edm4hep::MCParticleCollection>    m_mcParticleHandle{"MCParticles", Gaudi::DataHandle::Reader, this};
+    DataHandle<edm4hep::SimTrackerHitCollection>    m_vertexBarrelCollection{"VertexBarrelCollection", Gaudi::DataHandle::Reader, this};
+    
+    DataHandle<edm4hep::MCParticleCollection>    n_mcParticleHandle{"OverlaidMCParticles", Gaudi::DataHandle::Writer, this};
+ 
+ 
  };
   
