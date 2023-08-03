@@ -2,12 +2,22 @@
 #include "podio/ROOTFrameReader.h"
 #include "podio/Frame.h"
 
-
-
-
 DECLARE_COMPONENT(OverlayTiming)
 
 OverlayTiming::OverlayTiming(const std::string& aName, ISvcLocator* aSvcLoc) : GaudiAlgorithm(aName, aSvcLoc) {}
+
+template <typename T>
+OverlayTiming::overlayCollection(std::string& collName, podio::Frame& event, DataHandle<T>& collHandle) {
+  const auto& eventColl = event.get<T>(collName);
+  for(int objIdx=0; objIdx < eventColl.size(); objIdx++){
+    if(eventColl[objIdx].getTime()<inColl.second.second && eventColl[objIdx].getTime()>inColl.second.first){
+      info() << "Adding object: " << eventColl[objIdx].id() << "  at index: " << objIdx << endmsg;
+      collHandle.get()->push_back(eventColl[objIdx].clone());
+      info() << "Added object at index: " << objIdx << endmsg;
+    }
+  }
+}  
+
 
 OverlayTiming::~OverlayTiming() {}
 
@@ -61,26 +71,22 @@ StatusCode OverlayTiming::execute() {
     }
     unsigned number_of_events = rootFileReader.getEntries("events");
 
-    std::vector <int> file_event_list(nEvents);
-    int last_file_index=-1;
-    int file_size=inputFiles.size();
+    std::vector <int> event_list(nEvents);
 
     if(startEventIndex == -1){
       for(unsigned i = 0; i <nEvents; i++){
-        file_event_list[i]=rand()%nEvents;
+        event_list[i]=rand()%nEvents;
       }
     } else {
       int event_index = startEventIndex;
       for(unsigned i = 0; i < nEvents; i++){
         if(event_index>=number_of_events) event_index=0;
-        file_event_list[i]=event_index;
+        event_list[i]=event_index;
         event_index++;
       }
     }
 
-    //sort(file_event_list.begin(), file_event_list.end());
-
-    for(auto &elem : file_event_list  ){
+    for(auto &elem : event_list  ){
       std::cout<<" event "<<elem<<std::endl;
     }
 
@@ -91,57 +97,17 @@ StatusCode OverlayTiming::execute() {
     auto cn_vertexbarrel = edm4hep::SimTrackerHitCollection();
 
     for(int eventIdx=0; eventIdx < nEvents; eventIdx++) {
-      int eventId = file_event_list.at(eventIdx);
+      int eventId = event_list.at(eventIdx);
       // Reading the event
-      const auto event = podio::Frame(rootFileReader.readEntry("events", eventId)); // N is the number of the entry you want, 0 for first entry, 1 for the second one and so on
+      const auto event = podio::Frame(rootFileReader.readEntry("events", eventId));
 
-      // Loop over names in inputCollections
-        // Read the collection
-        // Loop over objects of the collection
-          // if the object satisfies time selection for this collection
-            // add object to the same collection of the main event
+        overlayCollection<edm4hep::MCParticleCollection>("MCParticles", event, m_mcParticleHandle);
+        overlayCollection<edm4hep::SimTrackerHitCollection> ("VertexBarrelCollection", event, m_vertexBarrelCollection);
 
-      for (auto &inColl : collectionFilterTimes)
-      {
-       if("MCParticles"==inColl.first){
-        const auto& particles = event.get<edm4hep::MCParticleCollection>("MCParticles");
-        for(int objIdx=0; objIdx < particles.size(); objIdx++){
-          if(particles[objIdx].getTime()<inColl.second.second && particles[objIdx].getTime()>inColl.second.first){
-            info() << "Adding object: " << particles[objIdx].id() << "  at index: " << objIdx << endmsg;
-              cn_mcparticles->push_back(particles[objIdx].clone());
-              info() << "Added object at index: " << objIdx << endmsg;
-          }
-        }
-       }else if ("VertexBarrelCollection"==inColl.first){
-        const auto& barrel = event.get<edm4hep::SimTrackerHitCollection>("VertexBarrelCollection");
-        for(int objIdx=0; objIdx < barrel.size(); objIdx++){
-          if(barrel[objIdx].getTime()<inColl.second.second && barrel[objIdx].getTime()>inColl.second.first){
-            info() << "Adding object: " << barrel[objIdx].id() << "  at index: " << objIdx << endmsg;
-              cn_vertexbarrel.push_back(barrel[objIdx].clone());
-              info() << "Added object at index: " << objIdx << endmsg;
-          }
-        }
-       }
-
-      } 
     }
 
     // Adding new collection to the main event
     n_mcParticleHandle.put(cn_mcparticles);
-
-  
-
-    
-
-
-
-
-
-
-
-
-
-
 
     info() << endmsg;
     info() << endmsg;

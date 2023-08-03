@@ -15,7 +15,7 @@ inp.collections = [
 
 from Configurables import OverlayTiming
 overlay = OverlayTiming()
-overlay.nEvents = 8
+overlay.nEvents = 9
 overlay.startEventIndex = 0
 overlay.inputFiles = [
     "../../simhit/bib_1_simhim.root",
