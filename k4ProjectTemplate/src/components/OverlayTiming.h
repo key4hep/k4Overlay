@@ -10,7 +10,7 @@ class OverlayTiming : public GaudiAlgorithm {
 public:
   explicit OverlayTiming(const std::string&, ISvcLocator*);
   template <typename T>
-  void overlayCollection(std::string collName, const podio::Frame& event, DataHandle<T>& collHandle);
+  void overlayCollection(std::string collName, const podio::Frame& event, T* collHandle);
   virtual ~OverlayTiming();
   /**  Initialize.
    *   @return status code
