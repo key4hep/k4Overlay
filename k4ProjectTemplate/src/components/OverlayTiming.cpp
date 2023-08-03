@@ -7,16 +7,16 @@ DECLARE_COMPONENT(OverlayTiming)
 OverlayTiming::OverlayTiming(const std::string& aName, ISvcLocator* aSvcLoc) : GaudiAlgorithm(aName, aSvcLoc) {}
 
 template <typename T>
-OverlayTiming::overlayCollection(std::string& collName, podio::Frame& event, DataHandle<T>& collHandle) {
+void OverlayTiming::overlayCollection(std::string collName, const podio::Frame& event, DataHandle<T>& collHandle) {
   const auto& eventColl = event.get<T>(collName);
   for(int objIdx=0; objIdx < eventColl.size(); objIdx++){
-    if(eventColl[objIdx].getTime()<inColl.second.second && eventColl[objIdx].getTime()>inColl.second.first){
+    if(eventColl[objIdx].getTime()<collectionFilterTimes[collName].second && eventColl[objIdx].getTime()>collectionFilterTimes[collName].first){
       info() << "Adding object: " << eventColl[objIdx].id() << "  at index: " << objIdx << endmsg;
       collHandle.get()->push_back(eventColl[objIdx].clone());
       info() << "Added object at index: " << objIdx << endmsg;
     }
   }
-}  
+};     
 
 
 OverlayTiming::~OverlayTiming() {}
@@ -101,10 +101,10 @@ StatusCode OverlayTiming::execute() {
       // Reading the event
       const auto event = podio::Frame(rootFileReader.readEntry("events", eventId));
 
-        overlayCollection<edm4hep::MCParticleCollection>("MCParticles", event, m_mcParticleHandle);
-        overlayCollection<edm4hep::SimTrackerHitCollection> ("VertexBarrelCollection", event, m_vertexBarrelCollection);
+        overlayCollection<edm4hep::MCParticleCollection>("MCParticles", event, n_mcParticleHandle);
+        // overlayCollection<edm4hep::SimTrackerHitCollection> ("VertexBarrelCollection", event, m_vertexBarrelCollection);
 
-    }
+    } 
 
     // Adding new collection to the main event
     n_mcParticleHandle.put(cn_mcparticles);
