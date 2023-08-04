@@ -5,12 +5,13 @@
 DECLARE_COMPONENT(OverlayTiming)
 
 OverlayTiming::OverlayTiming(const std::string& aName, ISvcLocator* aSvcLoc) : GaudiAlgorithm(aName, aSvcLoc) {
-    declareProperty("vectorfloat", n_mcParticleHandle, "Dummy collection (output)");
+    // declareProperty("vectorfloat", n_mcParticleHandle, "Dummy collection (output)");
 }
 
 template <typename T>
 void OverlayTiming::overlayCollection(std::string collName, const podio::Frame& event, T* newColl) {
   const auto& eventColl = event.get<T>(collName);
+
   for(int objIdx=0; objIdx < eventColl.size(); objIdx++){
     if(eventColl[objIdx].getTime()<collectionFilterTimes[collName].second && eventColl[objIdx].getTime()>collectionFilterTimes[collName].first){
       info() << "Adding object: " << eventColl[objIdx].id() << "  at index: " << objIdx << endmsg;
@@ -76,6 +77,7 @@ StatusCode OverlayTiming::execute() {
     std::vector <int> event_list(nEvents);
 
     if(startEventIndex == -1){
+      srand(0);
       for(unsigned i = 0; i <nEvents; i++){
         event_list[i]=rand()%nEvents;
       }
@@ -98,16 +100,27 @@ StatusCode OverlayTiming::execute() {
     auto cn_mcparticles = new edm4hep::MCParticleCollection();
     auto cn_vertexbarrel = edm4hep::SimTrackerHitCollection();
 
-    auto* newColl = n_mcParticleHandle.createAndPut();
-    //auto* newCollVertexBarrelCollection = n_mcParticleHandle.createAndPut();
 
+
+    auto handle = DataHandle<edm4hep::MCParticleCollection>();
+    auto* coll = handle.createAndPut();
+    
+    mapCollections["MCParticles"] = std::make_pair<DataHandle<edm4hep::MCParticleCollection>, edm4hep::MCParticleCollection*>(std::move(handle), coll);
+    
+    
+    
+    
     for(int eventIdx=0; eventIdx < nEvents; eventIdx++) {
       int eventId = event_list.at(eventIdx);
       // Reading the event
       const auto event = podio::Frame(rootFileReader.readEntry("events", eventId));
-      
-      overlayCollection<edm4hep::MCParticleCollection>("MCParticles", event, newColl);
-        // overlayCollection<edm4hep::SimTrackerHitCollection> ("VertexBarrelCollection", event, m_vertexBarrelCollection);
+
+
+
+
+
+
+      // overlayCollection<edm4hep::MCParticleCollection>("MCParticles", event, newColl);
 
     } 
 

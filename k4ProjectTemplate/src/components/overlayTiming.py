@@ -4,6 +4,11 @@ from Configurables import k4DataSvc
 podioevent = k4DataSvc("EventDataSvc")
 podioevent.input = "../../simhit/pgun_mu_simhim.root"
 
+from Configurables import PodioOutput
+out = PodioOutput("out")
+out.filename = "../../output_k4test/exampledata.root"
+out.outputCommands = ["keep *"]
+
 from Configurables import PodioInput
 
 inp = PodioInput()
@@ -23,7 +28,7 @@ overlay.inputFiles = [
     "../../simhit/bib_3_simhim.root",
 ]
 overlay.filterTimeMin = -0.25
-overlay.filterTimeMax = 25.25
+overlay.filterTimeMax = 30.25
 # Supported formats:
 #   <collection name>: []  << all objects
 #   <collection name>: [t_max]  << all objects with time < t_max
@@ -34,7 +39,7 @@ overlay.inputCollections = {
 }
 
 from Configurables import ApplicationMgr
-ApplicationMgr( TopAlg=[inp, overlay],
+ApplicationMgr( TopAlg=[inp, overlay, out],
                 EvtSel="NONE",
                 EvtMax=1,
                 ExtSvc=[podioevent],

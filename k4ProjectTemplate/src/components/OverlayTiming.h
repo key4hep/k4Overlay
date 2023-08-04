@@ -28,6 +28,8 @@ public:
 private:
   // member variable
     std::map< std::string, std::pair<float, float> > collectionFilterTimes{};
+    std::map<std::string, std::pair<DataHandle<edm4hep::MCParticleCollection>, edm4hep::MCParticleCollection*>> mapCollections{};
+
     Gaudi::Property<std::vector<std::string> >inputFiles{this, "inputFiles", NULL,
                                           "Name of the edm4hep input file(s) with background - assume one file per bunch crossing."};
     Gaudi::Property<int> nEvents{this, "nEvents", float(1),
@@ -54,7 +56,6 @@ private:
     DataHandle<edm4hep::MCParticleCollection>    m_mcParticleHandle{"MCParticles", Gaudi::DataHandle::Reader, this};
     DataHandle<edm4hep::SimTrackerHitCollection>    m_vertexBarrelCollection{"VertexBarrelCollection", Gaudi::DataHandle::Reader, this};
     
-    DataHandle<edm4hep::MCParticleCollection>    n_mcParticleHandle{"OverlaidMCParticles", Gaudi::DataHandle::Writer, this};
  
  
  };
