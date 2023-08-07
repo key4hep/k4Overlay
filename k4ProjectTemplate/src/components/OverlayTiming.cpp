@@ -100,14 +100,10 @@ StatusCode OverlayTiming::execute() {
     auto cn_mcparticles = new edm4hep::MCParticleCollection();
     auto cn_vertexbarrel = edm4hep::SimTrackerHitCollection();
 
-
-
     auto handle = DataHandle<edm4hep::MCParticleCollection>();
-    auto* coll = handle.createAndPut();
+    auto coll = handle.createAndPut();
     
     mapCollections["MCParticles"] = std::make_pair<DataHandle<edm4hep::MCParticleCollection>, edm4hep::MCParticleCollection*>(std::move(handle), coll);
-    
-    
     
     
     for(int eventIdx=0; eventIdx < nEvents; eventIdx++) {

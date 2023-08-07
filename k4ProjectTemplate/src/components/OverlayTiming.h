@@ -27,6 +27,7 @@ public:
 
 private:
   // member variable
+  
     std::map< std::string, std::pair<float, float> > collectionFilterTimes{};
     std::map<std::string, std::pair<DataHandle<edm4hep::MCParticleCollection>, edm4hep::MCParticleCollection*>> mapCollections{};
 

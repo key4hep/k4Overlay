@@ -28,7 +28,7 @@ overlay.inputFiles = [
     "../../simhit/bib_3_simhim.root",
 ]
 overlay.filterTimeMin = -0.25
-overlay.filterTimeMax = 30.25
+overlay.filterTimeMax = 50.25
 # Supported formats:
 #   <collection name>: []  << all objects
 #   <collection name>: [t_max]  << all objects with time < t_max
