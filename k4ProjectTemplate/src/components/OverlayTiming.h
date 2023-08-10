@@ -30,6 +30,9 @@ private:
   
     std::map< std::string, std::pair<float, float> > collectionFilterTimes{};
     std::map<std::string, std::pair<DataHandle<edm4hep::MCParticleCollection>, edm4hep::MCParticleCollection*>> mapCollections{};
+    
+    std::map<std::string, std::pair<DataHandle<edm4hep::MCParticleCollection>, edm4hep::MCParticleCollection*>> mo_MCParticlet{};
+    std::map<std::string, std::pair<DataHandle<edm4hep::SimTrackerHitCollection>, edm4hep::SimTrackerHitCollection*>> mo_SimTrackerHit{};
 
     Gaudi::Property<std::vector<std::string> >inputFiles{this, "inputFiles", NULL,
                                           "Name of the edm4hep input file(s) with background - assume one file per bunch crossing."};

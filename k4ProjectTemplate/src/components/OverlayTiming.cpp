@@ -1,6 +1,7 @@
 #include "OverlayTiming.h"
 #include "podio/ROOTFrameReader.h"
 #include "podio/Frame.h"
+#include "podio/CollectionBase.h"
 
 DECLARE_COMPONENT(OverlayTiming)
 
@@ -102,18 +103,22 @@ StatusCode OverlayTiming::execute() {
 
     auto handle = DataHandle<edm4hep::MCParticleCollection>();
     auto coll = handle.createAndPut();
-    
-    mapCollections["MCParticles"] = std::make_pair<DataHandle<edm4hep::MCParticleCollection>, edm4hep::MCParticleCollection*>(std::move(handle), coll);
-    
-    
+
+
+    mapCollections["MCParticles"] = {};
+    mapCollections["MCParticles"].first = std::move(handle);
+    mapCollections["MCParticles"].second = coll;
+
+    // Testing colleciton-type identification
+    // const auto event = podio::Frame(rootFileReader.readEntry("events", 0));
+    // const auto& eventColl = event.get<podio::CollectionBase>("MCParticles");
+    // std::cout<<"Collection type is: " << eventColl.getValueTypeName()<<std::endl;
+
+
     for(int eventIdx=0; eventIdx < nEvents; eventIdx++) {
       int eventId = event_list.at(eventIdx);
       // Reading the event
       const auto event = podio::Frame(rootFileReader.readEntry("events", eventId));
-
-
-
-
 
 
       // overlayCollection<edm4hep::MCParticleCollection>("MCParticles", event, newColl);
