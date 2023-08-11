@@ -110,10 +110,10 @@ StatusCode OverlayTiming::execute() {
     mapCollections["MCParticles"].second = coll;
 
     // Testing colleciton-type identification
-    // const auto event = podio::Frame(rootFileReader.readEntry("events", 0));
-    // const auto& eventColl = event.get<podio::CollectionBase>("MCParticles");
-    // std::cout<<"Collection type is: " << eventColl.getValueTypeName()<<std::endl;
-
+    const auto event = podio::Frame(rootFileReader.readEntry("events", 0));
+    DataHandle<podio::CollectionBase>    handle_mc{"MCParticles", Gaudi::DataHandle::Reader, this};
+    auto eventColl = handle_mc.get();
+    std::cout<<"Collection type is: " << eventColl->getValueTypeName()<<std::endl;
 
     for(int eventIdx=0; eventIdx < nEvents; eventIdx++) {
       int eventId = event_list.at(eventIdx);
