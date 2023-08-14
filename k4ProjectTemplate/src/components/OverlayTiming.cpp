@@ -58,7 +58,6 @@ StatusCode OverlayTiming::initialize() {
   }
   info() << "_____________________________________________";
 
-  
   return StatusCode::SUCCESS;
   
    }
@@ -101,19 +100,32 @@ StatusCode OverlayTiming::execute() {
     auto cn_mcparticles = new edm4hep::MCParticleCollection();
     auto cn_vertexbarrel = edm4hep::SimTrackerHitCollection();
 
-    auto handle = DataHandle<edm4hep::MCParticleCollection>();
-    auto coll = handle.createAndPut();
+    // auto handle = DataHandle<edm4hep::MCParticleCollection>("MCParticles_overlaid", Gaudi::DataHandle::Writer, this);
+    // auto* coll = handle.createAndPut();
 
+    // n_mcParticleHandle = DataHandle<edm4hep::MCParticleCollection>("OverlaidMCParticles", Gaudi::DataHandle::Writer, this);
+    // auto* newColl = n_mcParticleHandle.createAndPut ();
+    auto newColl = std::make_unique<edm4hep::MCParticleCollection>();
 
-    mapCollections["MCParticles"] = {};
-    mapCollections["MCParticles"].first = std::move(handle);
-    mapCollections["MCParticles"].second = coll;
+    // mo_MCParticlet["MCParticles"] = {};
+    // mo_MCParticlet["MCParticles"].first = std::move(handle);
+    // mo_MCParticlet["MCParticles"].second = coll;
+
+  // mo_collection["MCParticles"] = 
+
+    DataHandle<edm4hep::MCParticleCollection>    n_mcParticleHandle2{"OverlaidMCParticles2", Gaudi::DataHandle::Writer, this};
 
     // Testing colleciton-type identification
     const auto event = podio::Frame(rootFileReader.readEntry("events", 0));
     DataHandle<podio::CollectionBase>    handle_mc{"MCParticles", Gaudi::DataHandle::Reader, this};
     auto eventColl = handle_mc.get();
     std::cout<<"Collection type is: " << eventColl->getValueTypeName()<<std::endl;
+    std::cout << "Collection size: " << eventColl->size() << std::endl;
+    const auto& inputColl = (const edm4hep::MCParticleCollection&)(*eventColl);
+    const auto& particle = inputColl[0];
+    std::cout << "Element 0: " << particle.getPDG() << std::endl;
+    newColl->push_back(particle.clone());
+    n_mcParticleHandle.put(std::move(newColl));
 
     for(int eventIdx=0; eventIdx < nEvents; eventIdx++) {
       int eventId = event_list.at(eventIdx);

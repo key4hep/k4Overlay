@@ -11,6 +11,7 @@ public:
   explicit OverlayTiming(const std::string&, ISvcLocator*);
   template <typename T>
   void overlayCollection(std::string collName, const podio::Frame& event, T* collHandle);
+  
   virtual ~OverlayTiming();
   /**  Initialize.
    *   @return status code
@@ -31,6 +32,7 @@ private:
     std::map< std::string, std::pair<float, float> > collectionFilterTimes{};
     std::map<std::string, std::pair<DataHandle<edm4hep::MCParticleCollection>, edm4hep::MCParticleCollection*>> mapCollections{};
     
+    std::map<std::string, std::pair<DataHandle<podio::CollectionBase>, podio::CollectionBase*>> mo_collection{};
     std::map<std::string, std::pair<DataHandle<edm4hep::MCParticleCollection>, edm4hep::MCParticleCollection*>> mo_MCParticlet{};
     std::map<std::string, std::pair<DataHandle<edm4hep::SimTrackerHitCollection>, edm4hep::SimTrackerHitCollection*>> mo_SimTrackerHit{};
 
@@ -59,6 +61,8 @@ private:
 
     DataHandle<edm4hep::MCParticleCollection>    m_mcParticleHandle{"MCParticles", Gaudi::DataHandle::Reader, this};
     DataHandle<edm4hep::SimTrackerHitCollection>    m_vertexBarrelCollection{"VertexBarrelCollection", Gaudi::DataHandle::Reader, this};
+
+    DataHandle<edm4hep::MCParticleCollection>    n_mcParticleHandle{"OverlaidMCParticles", Gaudi::DataHandle::Writer, this};
     
  
  
