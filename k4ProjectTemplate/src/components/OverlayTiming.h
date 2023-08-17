@@ -10,7 +10,8 @@ class OverlayTiming : public GaudiAlgorithm {
 public:
   explicit OverlayTiming(const std::string&, ISvcLocator*);
   template <typename T>
-  void overlayCollection(std::string collName, const podio::Frame& event, T* collHandle);
+  // void overlayCollection(std::string collName, const podio::Frame& event, T* collHandle);
+  void overlayCollection(std::string collName, const podio::CollectionBase& inColl);
   
   virtual ~OverlayTiming();
   /**  Initialize.
@@ -30,11 +31,8 @@ private:
   // member variable
   
     std::map< std::string, std::pair<float, float> > collectionFilterTimes{};
-    std::map<std::string, std::pair<DataHandle<edm4hep::MCParticleCollection>, edm4hep::MCParticleCollection*>> mapCollections{};
+    std::map<std::string, podio::CollectionBase*> mo_collections;
     
-    std::map<std::string, std::pair<DataHandle<podio::CollectionBase>, podio::CollectionBase*>> mo_collection{};
-    std::map<std::string, std::pair<DataHandle<edm4hep::MCParticleCollection>, edm4hep::MCParticleCollection*>> mo_MCParticlet{};
-    std::map<std::string, std::pair<DataHandle<edm4hep::SimTrackerHitCollection>, edm4hep::SimTrackerHitCollection*>> mo_SimTrackerHit{};
 
     Gaudi::Property<std::vector<std::string> >inputFiles{this, "inputFiles", NULL,
                                           "Name of the edm4hep input file(s) with background - assume one file per bunch crossing."};
@@ -59,10 +57,7 @@ private:
     Gaudi::Property<std::map<std::string, std::vector<double> > > inputCollections{this, "inputCollections",std::map<std::string, std::vector<double> >()};
 
 
-    DataHandle<edm4hep::MCParticleCollection>    m_mcParticleHandle{"MCParticles", Gaudi::DataHandle::Reader, this};
-    DataHandle<edm4hep::SimTrackerHitCollection>    m_vertexBarrelCollection{"VertexBarrelCollection", Gaudi::DataHandle::Reader, this};
-
-    DataHandle<edm4hep::MCParticleCollection>    n_mcParticleHandle{"OverlaidMCParticles", Gaudi::DataHandle::Writer, this};
+    DataHandle<podio::CollectionBase>    n_mcParticleHandle{"OverlaidMCParticles", Gaudi::DataHandle::Writer, this};
     
  
  

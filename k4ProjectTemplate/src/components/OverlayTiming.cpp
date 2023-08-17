@@ -10,18 +10,19 @@ OverlayTiming::OverlayTiming(const std::string& aName, ISvcLocator* aSvcLoc) : G
 }
 
 template <typename T>
-void OverlayTiming::overlayCollection(std::string collName, const podio::Frame& event, T* newColl) {
-  const auto& eventColl = event.get<T>(collName);
-
-  for(int objIdx=0; objIdx < eventColl.size(); objIdx++){
-    if(eventColl[objIdx].getTime()<collectionFilterTimes[collName].second && eventColl[objIdx].getTime()>collectionFilterTimes[collName].first){
-      info() << "Adding object: " << eventColl[objIdx].id() << "  at index: " << objIdx << endmsg;
-      newColl->push_back(eventColl[objIdx].clone());
+void OverlayTiming::overlayCollection(std::string collName, const podio::CollectionBase& inputColl) {
+  // Converting generic type of collections to the specific one
+  auto outColl = (T*)mo_collections.at(collName);
+  const T& inColl = (const T&)inputColl;
+  // Adding objects to the output collection
+  for(int objIdx=0; objIdx < inColl.size(); objIdx++){
+   // if(inColl[objIdx].getTime()<collectionFilterTimes[collName].second && inColl[objIdx].getTime()>collectionFilterTimes[collName].first){
+      info() << "Adding object: " << inColl[objIdx].id() << "  at index: " << objIdx << " to collection: " << collName << endmsg;
+      outColl->push_back(inColl[objIdx].clone());
       info() << "Added object at index: " << objIdx << endmsg;
-    }
+    //}
   }
-};     
-
+};
 
 OverlayTiming::~OverlayTiming() {}
 
@@ -93,52 +94,55 @@ StatusCode OverlayTiming::execute() {
     for(auto &elem : event_list  ){
       std::cout<<" event "<<elem<<std::endl;
     }
-
-    auto co_mcparticles = m_mcParticleHandle.get();
-    auto co_vertexbarrel = m_vertexBarrelCollection.get();
-
-    auto cn_mcparticles = new edm4hep::MCParticleCollection();
-    auto cn_vertexbarrel = edm4hep::SimTrackerHitCollection();
-
-    // auto handle = DataHandle<edm4hep::MCParticleCollection>("MCParticles_overlaid", Gaudi::DataHandle::Writer, this);
-    // auto* coll = handle.createAndPut();
-
-    // n_mcParticleHandle = DataHandle<edm4hep::MCParticleCollection>("OverlaidMCParticles", Gaudi::DataHandle::Writer, this);
-    // auto* newColl = n_mcParticleHandle.createAndPut ();
+ 
     auto newColl = std::make_unique<edm4hep::MCParticleCollection>();
 
-    // mo_MCParticlet["MCParticles"] = {};
-    // mo_MCParticlet["MCParticles"].first = std::move(handle);
-    // mo_MCParticlet["MCParticles"].second = coll;
+    for (auto const& inColl : inputCollections) {
+      DataHandle<podio::CollectionBase>    handle{inColl.first, Gaudi::DataHandle::Reader, this};
+      auto eventColl = handle.get();
+      if(eventColl->getValueTypeName()=="edm4hep::MCParticle"){
+        mo_collections[inColl.first] = new edm4hep::MCParticleCollection();
+      }
+      if(eventColl->getValueTypeName()=="edm4hep::SimTrackerHit"){
+        mo_collections[inColl.first] = new edm4hep::SimTrackerHitCollection();
+      }
+    }
 
-  // mo_collection["MCParticles"] = 
+    for (auto const& inColl : inputCollections) {
+      DataHandle<podio::CollectionBase>    handle{inColl.first, Gaudi::DataHandle::Reader, this};
+      auto eventColl = handle.get();
+      if(eventColl->getValueTypeName()=="edm4hep::MCParticle"){
+        overlayCollection<edm4hep::MCParticleCollection>(inColl.first, *eventColl);
+      }
+      if(eventColl->getValueTypeName()=="edm4hep::SimTrackerHit"){
+        overlayCollection<edm4hep::SimTrackerHitCollection>(inColl.first, *eventColl);
+      }
+    }
 
-    DataHandle<edm4hep::MCParticleCollection>    n_mcParticleHandle2{"OverlaidMCParticles2", Gaudi::DataHandle::Writer, this};
-
-    // Testing colleciton-type identification
-    const auto event = podio::Frame(rootFileReader.readEntry("events", 0));
-    DataHandle<podio::CollectionBase>    handle_mc{"MCParticles", Gaudi::DataHandle::Reader, this};
-    auto eventColl = handle_mc.get();
-    std::cout<<"Collection type is: " << eventColl->getValueTypeName()<<std::endl;
-    std::cout << "Collection size: " << eventColl->size() << std::endl;
-    const auto& inputColl = (const edm4hep::MCParticleCollection&)(*eventColl);
-    const auto& particle = inputColl[0];
-    std::cout << "Element 0: " << particle.getPDG() << std::endl;
-    newColl->push_back(particle.clone());
-    n_mcParticleHandle.put(std::move(newColl));
-
-    for(int eventIdx=0; eventIdx < nEvents; eventIdx++) {
-      int eventId = event_list.at(eventIdx);
-      // Reading the event
-      const auto event = podio::Frame(rootFileReader.readEntry("events", eventId));
-
-
-      // overlayCollection<edm4hep::MCParticleCollection>("MCParticles", event, newColl);
-
-    } 
-
+    for (auto const& inColl : inputCollections) {
+      DataHandle<podio::CollectionBase>    handle{inColl.first, Gaudi::DataHandle::Reader, this};
+      auto eventColl = handle.get();
+      for(int eventIdx=0; eventIdx < nEvents; eventIdx++) {
+        int eventId = event_list.at(eventIdx);
+        // Reading the event
+        const auto event = podio::Frame(rootFileReader.readEntry("events", eventId));
+        const auto inputColl = event.get(inColl.first);
+        if(eventColl->getValueTypeName()=="edm4hep::MCParticle"){
+          overlayCollection<edm4hep::MCParticleCollection>(inColl.first, *inputColl);
+        }
+        if(eventColl->getValueTypeName()=="edm4hep::SimTrackerHit"){
+          overlayCollection<edm4hep::SimTrackerHitCollection>(inColl.first, *inputColl);
+        }
+      } 
+    }
     // Adding new collection to the main event
-
+    for (auto const& inColl : inputCollections) {
+      DataHandle<podio::CollectionBase>    handle{inColl.first, Gaudi::DataHandle::Reader, this};
+      auto eventColl = handle.get();
+      if(eventColl->getValueTypeName()=="edm4hep::MCParticle"){
+        n_mcParticleHandle.put(std::move(mo_collections["MCParticles"]));
+      }
+    }
     info() << endmsg;
     info() << endmsg;
     return StatusCode::SUCCESS;
