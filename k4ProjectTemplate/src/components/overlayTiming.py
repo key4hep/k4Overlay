@@ -16,6 +16,7 @@ inp.collections = [
     "MCParticles",
     "VertexBarrelCollection",
     "VertexEndcapCollection",
+    "HCalRingCollection",
 ]
 
 from Configurables import OverlayTiming
@@ -28,7 +29,7 @@ overlay.inputFiles = [
     "../../simhit/bib_3_simhim.root",
 ]
 overlay.filterTimeMin = -0.25
-overlay.filterTimeMax = 29.25
+overlay.filterTimeMax = 23.25
 # Supported formats:
 #   <collection name>: []  << all objects
 #   <collection name>: [t_max]  << all objects with time < t_max
@@ -36,6 +37,8 @@ overlay.filterTimeMax = 29.25
 overlay.inputCollections = {
     "MCParticles": [],
     "VertexBarrelCollection": [],
+    "HCalRingCollection": [],
+
 }
 
 from Configurables import ApplicationMgr

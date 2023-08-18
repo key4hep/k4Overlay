@@ -1,6 +1,7 @@
 #pragma once
 #include "edm4hep/MCParticleCollection.h"
 #include "edm4hep/SimTrackerHitCollection.h"
+#include "edm4hep/SimCalorimeterHitCollection.h"
 #include "k4FWCore/DataHandle.h"
 // GAUDI
 #include "Gaudi/Property.h"

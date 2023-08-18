@@ -12,17 +12,34 @@ OverlayTiming::OverlayTiming(const std::string& aName, ISvcLocator* aSvcLoc) : G
 template <typename T>
 void OverlayTiming::overlayCollection(std::string collName, const podio::CollectionBase& inputColl) {
   // Converting generic type of collections to the specific one
+  DataHandle<podio::CollectionBase>    handle{collName, Gaudi::DataHandle::Reader, this};
+  auto eventColl = handle.get();
   auto outColl = (T*)mo_collections.at(collName);
-  const T& inColl = (const T&)inputColl;
+  const T& inColl = (const T&)inputColl;  
+  
+  info() << "tipe of collection " << eventColl->getValueTypeName() << endmsg;
   // Adding objects to the output collection
   for(int objIdx=0; objIdx < inColl.size(); objIdx++){
-   // if(inColl[objIdx].getTime()<collectionFilterTimes[collName].second && inColl[objIdx].getTime()>collectionFilterTimes[collName].first){
-      info() << "Adding object: " << inColl[objIdx].id() << "  at index: " << objIdx << " to collection: " << collName << endmsg;
+    
+    if(inColl[objIdx].getTime()<collectionFilterTimes[collName].second && inColl[objIdx].getTime()>collectionFilterTimes[collName].first){
+      
+      // info() << "Adding object: " << inColl[objIdx].id() << "  at index: " << objIdx << " to collection: " << collName << endmsg;
       outColl->push_back(inColl[objIdx].clone());
-      info() << "Added object at index: " << objIdx << endmsg;
-    //}
+      // info() << "Added object at index: " << objIdx << endmsg;
+    }
   }
-};
+}
+
+template <>
+void OverlayTiming::overlayCollection<edm4hep::SimCalorimeterHitCollection>(std::string collName, const podio::CollectionBase& inputColl) {
+  // Converting generic type of collections to the specific one
+  DataHandle<podio::CollectionBase>    handle{collName, Gaudi::DataHandle::Reader, this};
+  auto eventColl = handle.get();
+  auto outColl = (edm4hep::SimCalorimeterHitCollection*)mo_collections.at(collName);
+  const edm4hep::SimCalorimeterHitCollection& inColl = (const edm4hep::SimCalorimeterHitCollection&)inputColl;  
+  
+  info() << "type of collection " << eventColl->getValueTypeName() << endmsg;
+}
 
 OverlayTiming::~OverlayTiming() {}
 
@@ -106,6 +123,9 @@ StatusCode OverlayTiming::execute() {
       if(eventColl->getValueTypeName()=="edm4hep::SimTrackerHit"){
         mo_collections[inColl.first] = new edm4hep::SimTrackerHitCollection();
       }
+      if(eventColl->getValueTypeName()=="edm4hep::SimCalorimeterHit"){
+        mo_collections[inColl.first] = new edm4hep::SimCalorimeterHitCollection();
+      }
     }
 
     for (auto const& inColl : inputCollections) {
@@ -116,6 +136,9 @@ StatusCode OverlayTiming::execute() {
       }
       if(eventColl->getValueTypeName()=="edm4hep::SimTrackerHit"){
         overlayCollection<edm4hep::SimTrackerHitCollection>(inColl.first, *eventColl);
+      }
+      if(eventColl->getValueTypeName()=="edm4hep::SimCalorimeterHit"){
+        overlayCollection<edm4hep::SimCalorimeterHitCollection>(inColl.first, *eventColl);
       }
     }
 
@@ -132,6 +155,9 @@ StatusCode OverlayTiming::execute() {
         }
         if(eventColl->getValueTypeName()=="edm4hep::SimTrackerHit"){
           overlayCollection<edm4hep::SimTrackerHitCollection>(inColl.first, *inputColl);
+        }
+        if(eventColl->getValueTypeName()=="edm4hep::SimCalorimeterHit"){
+          overlayCollection<edm4hep::SimCalorimeterHitCollection>(inColl.first, *inputColl);
         }
       } 
     }
